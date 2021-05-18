@@ -9,8 +9,8 @@ async function setCookies(res, data) {
     const accessToken = generateAccessToken(data)
     const refreshToken = await generateRefreshToken(data)
 
-    res.cookie('access', accessToken, {maxAge: 30 * 24 * 60 * 60 * 1000, secure: true, sameSite: 'none'})
-    res.cookie('refresh', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, secure: true, sameSite: 'none'})
+    res.cookie('access', accessToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'none'})
+    res.cookie('refresh', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, domain: 'carikos.netlify.app', httpOnly: true, secure: true, sameSite: 'none'})
 }
 
 export const login = async (req, res) => {
