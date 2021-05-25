@@ -10,7 +10,7 @@ async function setCookies(res, data) {
     const refreshToken = await generateRefreshToken(data)
 
     res.cookie('access', accessToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'none'})
-    res.cookie('refresh', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, path: '/', secure: true, sameSite: 'none'})
+    res.cookie('refresh', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'none'})
 }
 
 export const login = async (req, res) => {
@@ -55,7 +55,7 @@ export const token = async (req, res) => {
         if (exist) {
             const user = jwt.verify(token, config.refresh_key)
             await setCookies(res, user)
-            res.sendStatus(201)
+            res.status(201).json({token: 'absabsbabsjabsbbaj'})
         } else throw new Error
     } catch {
         res.sendStatus(403)
