@@ -56,7 +56,7 @@ export const token = async (req, res) => {
             }})
         } else throw new Error
     } catch (err) {
-        res.status(403).json(err)
+        res.status(403).json({err: err.message})
     }
 }
 
