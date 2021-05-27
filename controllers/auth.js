@@ -45,7 +45,7 @@ export const register = async (req, res) => {
 
 export const token = async (req, res) => {
     try {
-        const token = req.cookies?.refresh
+        const token = req.body.refresh
         const exist = await User.exists({token})
         if (exist) {
             const user = jwt.verify(token, config.refresh_key)

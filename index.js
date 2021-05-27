@@ -1,7 +1,6 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import {createServer} from 'http'
-import cookieParser from 'cookie-parser'
 import {Server} from 'socket.io'
 
 import cors from './middleware/cors.js'
@@ -27,7 +26,6 @@ const http = createServer(app)
 const io = new Server(http, {cors: {origin: config.origin}})
 
 app.use(express.json({limit: '50mb'}))
-app.use(cookieParser())
 app.use(cors)
 
 app.use('/auth', auth)

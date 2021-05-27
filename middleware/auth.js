@@ -3,7 +3,7 @@ import config from '../utils/config.js'
 
 export const authRoute = async (req, res, next) => {
     try {
-        const token = req.cookies?.access
+        const token = req.headers.authorization?.split(' ')[1]
 
         if (!token) throw new EvalError
 
@@ -11,13 +11,13 @@ export const authRoute = async (req, res, next) => {
         req.user = credentials
         next()
     } catch (err) {
-        err instanceof EvalError ? res.status(403).json({err: req.cookies}) : res.sendStatus(401)
+        err instanceof EvalError ? res.sendStatus(403) : res.sendStatus(401)
     }
 }
 
 export const ownerRoute = async (req, res, next) => {
     try {
-        const token = req.cookies?.access
+        const token = req.cookies.authorization?.split(' ')[1]
 
         if (!token) throw new EvalError
 
@@ -33,7 +33,7 @@ export const ownerRoute = async (req, res, next) => {
 
 export const customerRoute = async (req, res, next) => {
     try {
-        const token = req.cookies?.access
+        const token = req.cookies.authorization?.split(' ')[1]
 
         if (!token) throw new EvalError
 
