@@ -55,8 +55,8 @@ export const token = async (req, res) => {
                 token: {access, refresh}
             }})
         } else throw new Error
-    } catch {
-        res.sendStatus(403)
+    } catch (err) {
+        res.status(403).json(err)
     }
 }
 
