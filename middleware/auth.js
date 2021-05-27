@@ -11,7 +11,7 @@ export const authRoute = async (req, res, next) => {
         req.user = credentials
         next()
     } catch (err) {
-        err instanceof EvalError ? res.sendStatus(403) : res.sendStatus(401)
+        err instanceof EvalError ? res.status(403).json({...err}) : res.sendStatus(401)
     }
 }
 
