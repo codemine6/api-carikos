@@ -17,9 +17,9 @@ export const login = async (req, res) => {
                 _id: user._id,
                 email: user.email,
                 profileImage: user.profileImage,
-                token: {access, refresh},
                 type: user.type,
-                username: user.username
+                username: user.username,
+                token: {access, refresh}
             }})
         } else if (matching) {
             const token = await generateRefreshToken(user)
