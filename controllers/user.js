@@ -76,10 +76,10 @@ export const setPassword = async (req, res) => {
     }
 }
 
-export const getDetails = async (req, res) => {
+export const getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).lean()
-            .select('-_id city phone profileImage roomFavorites username')
+        const user = await User.findById(req.user._id).lean()
+        console.log(req.user)
         res.status(200).json({data: user})
     } catch {
         res.sendStatus(404)
