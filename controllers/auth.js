@@ -26,8 +26,7 @@ export const login = async (req, res) => {
             await sendVerification({...user, token})
             res.sendStatus(202)
         } else throw new Error
-    } catch (e) {
-        console.log(e)
+    } catch {
         res.status(400).json({message: 'Email atau password salah'})
     }
 }

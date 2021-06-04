@@ -53,6 +53,7 @@ export const updateUser = async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.user._id, {...req.body}, {runValidators: true, new: true})
         res.status(201).json({data: {
+            city: user.city,
             profileImage: user.profileImage,
             username: user.username
         }})
@@ -79,7 +80,7 @@ export const setPassword = async (req, res) => {
 export const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).lean()
-        console.log(req.user)
+            .select('-createdAt -token')
         res.status(200).json({data: user})
     } catch {
         res.sendStatus(404)
