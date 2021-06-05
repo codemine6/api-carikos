@@ -29,7 +29,7 @@ export function ChatHandler(socket) {
             })
         const data = await Promise.all(chats.map(async chat => {
             const lastMessage = await Message.findOne({chat: chat._id, deleteFor: {$ne: user}}).lean().sort({sendedAt: 'desc'})
-                .select('-_id sendedAt text')
+                .select('-_id read sendedAt sender text')
             const newMessage = await Message.find({chat: chat._id, read: false, receiver: user}).countDocuments()
             return {_id: chat._id, user: chat.users[0], lastMessage, newMessage}
         })).then(data => {
@@ -48,7 +48,9 @@ export function ChatHandler(socket) {
                 socket.emit('new_chat', {
                     _id: lastMessage.chat,
                     lastMessage: {
+                        read: lastMessage.read,
                         sendedAt: lastMessage.sendedAt,
+                        sender: lastMessage.sender,
                         text: lastMessage.text
                     },
                     newMessage,
