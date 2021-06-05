@@ -29,6 +29,7 @@ export function ChatHandler(socket) {
             })
         const data = await Promise.all(chats.map(async chat => {
             const lastMessage = await Message.findOne({chat: chat._id, deleteFor: {$ne: user}}).lean().sort({sendedAt: 'desc'})
+                .select('-_id sendedAt text')
             const newMessage = await Message.find({chat: chat._id, read: false, receiver: user}).countDocuments()
             return {_id: chat._id, user: chat.users[0], lastMessage, newMessage}
         })).then(data => {
@@ -36,23 +37,22 @@ export function ChatHandler(socket) {
             result.sort((a, b) => new Date(b.lastMessage.sendedAt) - new Date(a.lastMessage.sendedAt))
             return result
         })
-
         callback(data)
 
         Message.watch().on('change', async changes => {
             if (changes.operationType === 'insert' && changes.fullDocument.receiver === user) {
                 const lastMessage = changes.fullDocument
-                const newMessage = await Message.find({chat: lastMessage._id, read: false, receiver: user}).countDocuments()
-                console.log(newMessage)
-                const user = await User.findById(message.sender).lean()
+                const newMessage = await Message.find({chat: lastMessage.chat, read: false, receiver: user}).countDocuments()
+                const otherUser = await User.findById(lastMessage.sender).lean()
+                    .select('-_id username profileImage')
                 socket.emit('new_chat', {
-                    _id: message.chat,
-                    lastMessage,
-                    newMessage: 0,
-                    user: {
-                        profileImage: user.profileImage,
-                        username: user.username
-                    }
+                    _id: lastMessage.chat,
+                    lastMessage: {
+                        sendedAt: lastMessage.sendedAt,
+                        text: lastMessage.text
+                    },
+                    newMessage,
+                    user: otherUser
                 })
             }
         })
