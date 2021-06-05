@@ -28,18 +28,26 @@ export function ChatHandler(socket) {
                 select: '-_id username profileImage'
             })
         const data = await Promise.all(chats.map(async chat => {
-            const message = await Message.findOne({chat: chat._id, deleteFor: {$ne: user}}).lean().sort({sendedAt: 'desc'})
-            return {_id: chat._id, user: chat.users[0], message}
-        })).then(data => data.filter(item => item.message).sort((a, b) => new Date(b.message.sendedAt) - new Date(a.message.sendedAt)))
+            const lastMessage = await Message.findOne({chat: chat._id, deleteFor: {$ne: user}}).lean().sort({sendedAt: 'desc'})
+            const newMessage = await Message.find({chat: chat._id, read: false, receiver: user}).countDocuments()
+            return {_id: chat._id, user: chat.users[0], lastMessage, newMessage}
+        })).then(data => {
+            const result = data.filter(item => item.lastMessage)
+            result.sort((a, b) => new Date(b.lastMessage.sendedAt) - new Date(a.lastMessage.sendedAt))
+            return result
+        })
+
         callback(data)
 
         Message.watch().on('change', async changes => {
             if (changes.operationType === 'insert' && changes.fullDocument.receiver === user) {
-                const message = changes.fullDocument
+                const lastMessage = changes.fullDocument
+                const newMessage = await Message.find({chat: chat._id, read: false, receiver: user}).countDocuments()
                 const user = await User.findById(message.sender).lean()
                 socket.emit('new_chat', {
                     _id: message.chat,
-                    message,
+                    lastMessage,
+                    newMessage,
                     user: {
                         profileImage: user.profileImage,
                         username: user.username
