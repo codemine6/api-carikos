@@ -42,12 +42,13 @@ export function ChatHandler(socket) {
         Message.watch().on('change', async changes => {
             if (changes.operationType === 'insert' && changes.fullDocument.receiver === user) {
                 const lastMessage = changes.fullDocument
-                const newMessage = await Message.find({chat: chat._id, read: false, receiver: user}).countDocuments()
+                const newMessage = await Message.find({chat: lastMessage._id, read: false, receiver: user}).countDocuments()
+                console.log(newMessage)
                 const user = await User.findById(message.sender).lean()
                 socket.emit('new_chat', {
                     _id: message.chat,
                     lastMessage,
-                    newMessage,
+                    newMessage: 0,
                     user: {
                         profileImage: user.profileImage,
                         username: user.username
