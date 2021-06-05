@@ -1,9 +1,7 @@
 import User from '../models/User.js'
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import {sendVerification} from '../utils/emailActions.js'
 import {generateAccessToken, generateRefreshToken} from '../utils/generateToken.js'
-import config from '../utils/config.js'
 
 export const login = async (req, res) => {
     try {
@@ -45,9 +43,8 @@ export const register = async (req, res) => {
 export const token = async (req, res) => {
     try {
         const token = req.body.refresh
-        const exist = await User.exists({token})
-        if (exist) {
-            const user = jwt.verify(token, config.refresh_key)
+        const user = await User.findOne({token}).lean().select('type')
+        if (user) {
             const access = generateAccessToken(user)
             const refresh = await generateRefreshToken(user)
             res.status(201).json({data: {

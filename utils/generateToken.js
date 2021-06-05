@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import config from './config.js'
 
 export function generateAccessToken({_id, type}) {
-    return jwt.sign({_id, type}, config.access_key, {expiresIn: '10s'})
+    return jwt.sign({_id, type}, config.access_key, {expiresIn: '30m'})
 }
 
 export async function generateRefreshToken({_id}) {
