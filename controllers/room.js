@@ -110,6 +110,15 @@ export const getFavorites = async (req, res) => {
     }
 }
 
+export const getNearest = async (req, res) => {
+    try {
+        const rooms = await Room.find().lean()
+        res.status(200).json({data: rooms})
+    } catch {
+        res.sendStatus(404)
+    }
+}
+
 export const getOneRoom = async (req, res) => {
     try {
         const room = await Room.findById(req.params.id).lean()
