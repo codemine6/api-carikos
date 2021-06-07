@@ -113,6 +113,8 @@ export const getFavorites = async (req, res) => {
 export const getNearest = async (req, res) => {
     try {
         const rooms = await Room.find().lean()
+            .select('images location.address location.coords name pricing')
+            .slice('images', 1)
         res.status(200).json({data: rooms})
     } catch {
         res.sendStatus(404)
