@@ -121,6 +121,22 @@ export const getNearest = async (req, res) => {
     }
 }
 
+export const getCityRooms = async (req, res) => {
+    try {
+        const rooms = await Room.find({'location.city': req.params.city}).lean()
+            .select('customerType images location.city location.address name pricing')
+            .slice('images', 1)
+        const data = await Promise.all(rooms.map(async room => {
+            const ratings = await Review.find({room: room._id}).lean().select('-_id rating')
+            const rating = ratings.reduce((a, b) => a + b.rating, 0) / ratings.length || 0
+            return {...room, rating}
+        }))
+        res.status(200).json({data})
+    } catch {
+        res.sendStatus(404)
+    }
+}
+
 export const getOneRoom = async (req, res) => {
     try {
         const room = await Room.findById(req.params.id).lean()
