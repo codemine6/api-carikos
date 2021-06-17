@@ -2,21 +2,7 @@ import Chat from '../models/Chat.js'
 import Message from '../models/Message.js'
 
 export function MessageHandler(socket) {
-    socket.on('messages', async (params, callback) => {
-        const chat = await Chat.findById(params.chat).lean().select('-_id -startedAt')
-            .populate({
-                path: 'users',
-                match: {_id: {$ne: params.user}},
-                select: 'username profileImage'
-            })
-        const messages = await Message.find({chat: params.chat, deleteFor: {$ne: params.user}}).lean()
-        messages.map(async message => {
-            if (message.sender !== params.user && !message.read) {
-                await Message.findByIdAndUpdate(message._id, {read: true})
-            }
-        })
-        callback({user: chat.users[0], messages})
-
+    socket.on('messages', async params => {
         Message.watch().on('change', async changes => {
             if (
                 changes.operationType === 'insert' &&
