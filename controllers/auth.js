@@ -43,7 +43,7 @@ export const register = async (req, res) => {
 export const token = async (req, res) => {
     try {
         const token = req.body.refresh
-        const user = await User.findOne({token}).lean().select('type')
+        const user = await User.findOne({token}).lean().select('profileImage type username')
         if (user) {
             const access = generateAccessToken(user)
             const refresh = await generateRefreshToken(user)
